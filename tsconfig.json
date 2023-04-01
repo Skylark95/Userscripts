@@ -8,10 +8,11 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "declaration": false,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
   },
   "include": [
     "*.ts",
-    "node_modules/@violentmonkey/types"
+    "node_modules/@violentmonkey/types",
+    "node_modules/@violentmonkey/shortcut/types"
   ]
 }

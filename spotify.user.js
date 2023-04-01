@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Spotify
+// @name        Spotify Styles
 // @namespace   https://github.com/Skylark95/Userscripts
 // @match       https://open.spotify.com/*
 // @grant       GM_addStyle
@@ -7,8 +7,11 @@
 // @author      Derek Cochran
 // @description Personal style changes for Spotify
 // ==/UserScript==
-GM_addStyle(`
-  .fyaNJr {
-    font-size: 1rem !important
-  }
-`);
+function spotify() {
+    GM_addStyle(`
+    .fyaNJr {
+      font-size: 1rem !important
+    }
+  `);
+}
+spotify();
