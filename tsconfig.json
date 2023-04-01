@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "strict": true,
+    "alwaysStrict": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "declaration": false,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "*.ts",
+    "node_modules/@violentmonkey/types"
+  ]
+}

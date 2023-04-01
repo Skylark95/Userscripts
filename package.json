@@ -1,0 +1,39 @@
+{
+  "name": "userscripts",
+  "version": "1.0.0",
+  "description": "A collection of my personal userscripts for use with Violentmonkey",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint .",
+    "server": "http-server -c5",
+    "start": "concurrently npm:watch npm:server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Skylark95/Userscripts.git"
+  },
+  "keywords": [
+    "userscript",
+    "userscripts",
+    "violentmonkey"
+  ],
+  "author": "Derek Cochran <derek@derekcochran.dev>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Skylark95/Userscripts/issues"
+  },
+  "homepage": "https://github.com/Skylark95/Userscripts#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.37.0",
+    "http-server": "^14.1.1",
+    "typescript": "^5.0.3"
+  },
+  "dependencies": {
+    "@violentmonkey/types": "^0.1.5"
+  }
+}
