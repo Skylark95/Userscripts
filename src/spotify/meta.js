@@ -7,12 +7,3 @@
 // @author      Derek Cochran
 // @description Personal style changes for Spotify
 // ==/UserScript==
-function spotify() {
-  GM_addStyle(`
-    .fyaNJr {
-      font-size: 1rem !important
-    }
-  `);
-}
-
-spotify();

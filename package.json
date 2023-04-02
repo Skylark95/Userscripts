@@ -3,11 +3,9 @@
   "version": "1.0.0",
   "description": "A collection of my personal userscripts for use with Violentmonkey",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
+    "build": "node ./build.mjs",
     "lint": "eslint .",
-    "server": "http-server -c5",
-    "start": "concurrently npm:watch npm:server",
+    "server": "http-server -c5 dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,7 +26,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
-    "concurrently": "^8.0.1",
+    "esbuild": "0.17.15",
     "eslint": "^8.37.0",
     "http-server": "^14.1.1",
     "typescript": "^5.0.3"

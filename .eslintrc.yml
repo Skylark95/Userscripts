@@ -12,9 +12,9 @@ parserOptions:
   ecmaVersion: latest
 plugins:
   - '@typescript-eslint'
+ignorePatterns: 
+  - dist/**.js
 rules:
   semi:
     - error
     - always
-globals:
-  - VM
