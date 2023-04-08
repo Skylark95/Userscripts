@@ -323,14 +323,21 @@
     constructor() {
       this.plugins = [];
       this.shortcuts = [];
+      this.debug = false;
     }
     run() {
       this.plugins.forEach((plugin) => {
         if (plugin.matches(window.location)) {
+          if (this.debug) {
+            console.log(`Running plugin '${plugin.constructor.name}'`);
+          }
           plugin.run();
         }
       });
       this.shortcuts.forEach((shortcut) => {
+        if (this.debug) {
+          console.log(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.constructor.name}'`);
+        }
         register(shortcut.key, shortcut.callback, shortcut.options);
       });
     }

@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true,
   },
   "include": [
-    "src/**.ts",
+    "src/**/*",
     "node_modules/@violentmonkey/types",
     "node_modules/@violentmonkey/shortcut/types", "src/ggdeals/ggdeals.user.ts", "src/spotify/spotify.user.ts", "src/steam/steam.user.ts"]
 }

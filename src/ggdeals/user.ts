@@ -12,7 +12,7 @@ class GGDealsSearchShortcut implements UserScriptShortcut {
 
 class GGDealsSteamLinksPlugin implements UserScriptPlugin {
   matches(location: Location) {
-    return !!location.pathname.match(/\/[bundle|deal].+/);
+    return !!location.pathname.match(/\/(bundle|deal)\/.+/);
   }
   run() {
     const items = document.querySelectorAll('.game-item');
