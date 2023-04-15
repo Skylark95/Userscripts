@@ -1,9 +1,6 @@
 import { UserScript, UserScriptPlugin } from "../types";
 
 class SpotifyStylePlugin implements UserScriptPlugin {
-  matches() {
-    return true;
-  }
   run() {
     GM_addStyle(`
       .fyaNJr {

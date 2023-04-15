@@ -318,25 +318,37 @@
   var register = (...args) => getService().register(...args);
 
   // src/types.ts
+  var Logger = class {
+    constructor(level = 1 /* Info */) {
+      this.level = level;
+    }
+    debug(data) {
+      if (this.level <= 0 /* Debug */) {
+        console.log(data);
+      }
+    }
+    info(data) {
+      if (this.level <= 1 /* Info */) {
+        console.log(data);
+      }
+    }
+  };
   var UserScript = class {
     constructor() {
       this.plugins = [];
       this.shortcuts = [];
-      this.debug = false;
+      this.logger = new Logger();
     }
     run() {
       this.plugins.forEach((plugin) => {
-        if (plugin.matches(window.location)) {
-          if (this.debug) {
-            console.log(`Running plugin '${plugin.constructor.name}'`);
-          }
+        const matches = plugin.matches || (() => true);
+        if (matches(window.location)) {
+          this.logger.debug(`Running plugin '${plugin.constructor.name}'`);
           plugin.run();
         }
       });
       this.shortcuts.forEach((shortcut) => {
-        if (this.debug) {
-          console.log(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.constructor.name}'`);
-        }
+        this.logger.debug(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.constructor.name}'`);
         register(shortcut.key, shortcut.callback, shortcut.options);
       });
     }

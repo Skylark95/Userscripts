@@ -7,28 +7,50 @@ export interface UserScriptShortcut {
 }
 
 export interface UserScriptPlugin {
-  matches: (location: Location) => boolean;
   run: () => void;
+  matches?: (location: Location) => boolean;
+}
+
+export enum LogLevel {
+  Debug,
+  Info
+}
+
+export class Logger {
+  level: LogLevel;
+
+  constructor(level = LogLevel.Info) {
+    this.level = level;
+  }
+
+  debug(data: string) {
+    if (this.level <= LogLevel.Debug) {
+      console.log(data);
+    }
+  }
+
+  info(data: string) {
+    if (this.level <= LogLevel.Info) {
+      console.log(data);
+    }
+  }
 }
 
 export class UserScript {
   plugins: UserScriptPlugin[] = [];
   shortcuts: UserScriptShortcut[] = [];
-  debug = false;
+  logger = new Logger();
 
   run() {
     this.plugins.forEach(plugin => {
-      if (plugin.matches(window.location)) {
-        if (this.debug) {
-          console.log(`Running plugin '${plugin.constructor.name}'`);
-        }
+      const matches = plugin.matches || (() => true);
+      if (matches(window.location)) {
+        this.logger.debug(`Running plugin '${plugin.constructor.name}'`);
         plugin.run();
       }
     });
     this.shortcuts.forEach(shortcut => {
-      if (this.debug) {
-        console.log(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.constructor.name}'`);
-      }
+      this.logger.debug(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.constructor.name}'`);
       register(shortcut.key, shortcut.callback, shortcut.options);
     });
   }
