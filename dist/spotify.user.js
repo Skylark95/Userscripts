@@ -318,7 +318,7 @@
   }
   var register = (...args) => getService().register(...args);
 
-  // src/types.ts
+  // src/userscript.ts
   var Logger = class {
     constructor(level = 1 /* Info */) {
       this.level = level;
@@ -334,42 +334,88 @@
       }
     }
   };
-  var UserScript = class {
-    constructor() {
-      this.plugins = [];
-      this.shortcuts = [];
-      this.logger = new Logger();
+  var UserScriptEventListener = class {
+    constructor(logger, plugin, options) {
+      this.logger = logger;
+      this.plugin = plugin;
+      this.options = options;
     }
-    run() {
-      this.plugins.forEach((plugin) => {
-        const matches = plugin.matches || (() => true);
-        if (matches(window.location)) {
-          this.logger.debug(`Running plugin '${plugin.constructor.name}'`);
-          plugin.run();
-        }
-      });
-      this.shortcuts.forEach((shortcut) => {
-        this.logger.debug(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.constructor.name}'`);
-        register(shortcut.key, shortcut.callback, shortcut.options);
-      });
+    register() {
+      const elements = document.querySelectorAll(this.options.querySelector);
+      for (const el of elements) {
+        el.addEventListener(this.options.type, this.listener());
+      }
+      this.logger.debug(`Registered '${elements.length}' event handlers for '${this.options.name}'`);
+    }
+    listener() {
+      const logger = this.logger;
+      const plugin = this.plugin;
+      const options = this.options;
+      const register2 = () => this.register();
+      return function(event) {
+        logger.debug(`handle called for '${options.name}' with delay of '${options.delay}'`);
+        setTimeout(() => {
+          logger.debug(`Started running plugin '${plugin.name}'`);
+          plugin.run({ event, logger });
+          logger.debug(`Finished running plugin '${plugin.name}'`);
+          register2();
+        }, options.delay);
+      };
     }
   };
+  var UserScript = class {
+    constructor(logger) {
+      this.logger = logger;
+      this.context = { logger };
+    }
+    registerPlugin(plugin) {
+      const matches = plugin.matches || (() => true);
+      if (matches(window.location)) {
+        const events = plugin.events || [];
+        events.forEach((event) => this.registerEvent(plugin, event));
+        this.logger.debug(`Started running plugin '${plugin.name}'`);
+        plugin.run(this.context);
+        this.logger.debug(`Finished running plugin '${plugin.name}'`);
+      } else {
+        this.logger.debug(`Skipping plugin '${plugin.name}' as matches returned false`);
+      }
+    }
+    registerEvent(plugin, event) {
+      this.logger.debug(`Registering event '${event.name}`);
+      const listener = new UserScriptEventListener(this.logger, plugin, event);
+      listener.register();
+    }
+    registerShortcut(shortcut) {
+      this.logger.debug(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.name}'`);
+      register(shortcut.key, shortcut.callback, shortcut.options);
+    }
+  };
+  function userscript_default({
+    name,
+    plugins = [],
+    shortcuts = [],
+    logLevel = 1 /* Info */
+  }) {
+    const logger = new Logger(logLevel);
+    const userscript = new UserScript(logger);
+    logger.debug(`Started running userscript '${name}'`);
+    plugins.forEach((plugin) => userscript.registerPlugin(plugin));
+    shortcuts.forEach((shortcut) => userscript.registerShortcut(shortcut));
+    logger.debug(`Finished running userscript '${name}'`);
+  }
 
   // src/spotify/user.ts
-  var SpotifyStylePlugin = class {
-    run() {
-      GM_addStyle(`
-      .fyaNJr {
-        font-size: 1rem !important
+  userscript_default({
+    name: "spotify",
+    plugins: [{
+      name: "spotify style",
+      run: () => {
+        GM_addStyle(`
+        .fyaNJr {
+          font-size: 1rem !important
+        }
+      `);
       }
-    `);
-    }
-  };
-  var SpotifyUserScript = class extends UserScript {
-    constructor() {
-      super(...arguments);
-      this.plugins = [new SpotifyStylePlugin()];
-    }
-  };
-  new SpotifyUserScript().run();
+    }]
+  });
 })();

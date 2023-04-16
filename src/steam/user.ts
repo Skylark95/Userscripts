@@ -1,17 +1,15 @@
-import { UserScript, UserScriptShortcut } from "../types";
+import userscript from "../userscript";
 
-class SteamSearchShortcut implements UserScriptShortcut {
-    key = '/';
-    callback() {
+userscript({
+  name: 'steam',
+  shortcuts: [{
+    name: 'steam search shortcut',
+    key: '/',
+    callback: () => {
       const input = document.querySelector('#store_nav_search_term');
       if (input) {
-          (input as HTMLElement).focus();
+        (input as HTMLElement).focus();
       }
     }
-}
-
-class SteamUserScript extends UserScript {
-  shortcuts = [new SteamSearchShortcut()];
-}
-
-new SteamUserScript().run();
+  }]
+});

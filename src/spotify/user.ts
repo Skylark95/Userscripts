@@ -1,17 +1,15 @@
-import { UserScript, UserScriptPlugin } from "../types";
+import userscript from "../userscript";
 
-class SpotifyStylePlugin implements UserScriptPlugin {
-  run() {
-    GM_addStyle(`
-      .fyaNJr {
-        font-size: 1rem !important
-      }
-    `);
-  }
-}
-
-class SpotifyUserScript extends UserScript {
-  plugins = [new SpotifyStylePlugin()];
-}
-
-new SpotifyUserScript().run();
+userscript({
+  name: 'spotify',
+  plugins: [{
+    name: 'spotify style',
+    run: () => {
+      GM_addStyle(`
+        .fyaNJr {
+          font-size: 1rem !important
+        }
+      `);
+    }
+  }]
+});
