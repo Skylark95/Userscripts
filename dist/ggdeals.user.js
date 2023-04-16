@@ -405,6 +405,25 @@
   }
 
   // src/ggdeals/user.ts
+  function requestSteamLink(a, title) {
+    GM_xmlhttpRequest({
+      method: "GET",
+      url: `https://store.steampowered.com/search/suggest?term=${encodeURIComponent(title)}&f=games&cc=US`,
+      responseType: "document",
+      onload: (r) => {
+        const d = r.response;
+        const match = d.querySelector(".match");
+        if (!match) {
+          return;
+        }
+        const href = match.getAttribute("href");
+        if (href) {
+          a.setAttribute("href", href);
+          a.setAttribute("target", "_blank");
+        }
+      }
+    });
+  }
   userscript_default({
     name: "gg.deals",
     shortcuts: [{
@@ -418,7 +437,7 @@
       }
     }],
     plugins: [{
-      name: "gg.deals steam links",
+      name: "gg.deals steam links on bundle and deal pages",
       matches: (location) => !!location.pathname.match(/\/(bundle|deal)\/.+/),
       events: [{
         name: "gg.deals page navigation event",
@@ -437,23 +456,24 @@
           if (!a) {
             continue;
           }
-          GM_xmlhttpRequest({
-            method: "GET",
-            url: `https://store.steampowered.com/search/suggest?term=${encodeURIComponent(title.textContent)}&f=games&cc=US`,
-            responseType: "document",
-            onload: (r) => {
-              const d = r.response;
-              const match = d.querySelector(".match");
-              if (!match) {
-                return;
-              }
-              const href = match.getAttribute("href");
-              if (href) {
-                a.setAttribute("href", href);
-                a.setAttribute("target", "_blank");
-              }
-            }
-          });
+          requestSteamLink(a, title.textContent);
+        }
+      }
+    }, {
+      name: "gg.deals steam links on blog pages",
+      matches: (location) => !!location.pathname.match(/\/(blog)\/.+/),
+      run: () => {
+        const items = document.querySelectorAll(".game-items-header");
+        for (const item of items) {
+          const title = item.querySelector(".game-info .game-info-title-wrapper .game-info-title");
+          if (!title || !title.hasAttribute("data-title-auto-hide")) {
+            continue;
+          }
+          const a = item.querySelector("a");
+          if (!a) {
+            continue;
+          }
+          requestSteamLink(a, title.getAttribute("data-title-auto-hide") || "");
         }
       }
     }]
