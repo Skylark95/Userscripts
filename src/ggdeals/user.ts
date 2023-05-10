@@ -22,7 +22,7 @@ function requestSteamLink(a: HTMLAnchorElement, title: string) {
 
 userscript({
   name: 'gg.deals',
-  logLevel: LogLevel.Debug,
+  logLevel: LogLevel.Info,
   shortcuts: [{
     name: 'gg.deals search shortcut',
     key: '/',
@@ -37,10 +37,15 @@ userscript({
     name: 'gg.deals steam links on bundle and deal pages',
     matches: (location: Location) => !!location.pathname.match(/\/(bundle|deal)\/.+/),
     events:[{
-      name: 'gg.deals page update event',
+      name: 'gg.deals page navigation event',
       type: 'click',
       delay: 2000,
-      querySelector: ['.pjax-link', '.filter', '.badge-filter']
+      querySelector: '.pjax-link'
+    }, {
+      name: 'gg.deals filter change event',
+      type: 'click',
+      delay: 2000,
+      querySelector: ['.filter', '.badge-filter']
     }],
     run: () => {
       const items = document.querySelectorAll('.game-item');

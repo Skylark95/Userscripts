@@ -334,8 +334,9 @@
     }
   };
   var UserScriptEventListener = class {
-    constructor(logger, plugin, options) {
-      this.logger = logger;
+    constructor(userscript, plugin, options) {
+      this.userscript = userscript;
+      this.logger = userscript.logger;
       this.plugin = plugin;
       this.options = options;
     }
@@ -349,13 +350,13 @@
         }
         count = count + elements.length;
       }
-      this.logger.debug(`Registered '${count}' event handlers for '${this.options.name}'`);
+      this.logger.debug(`Registered '${count}' event handlers for '${this.options.name}' (plugin: ${this.plugin.name})`);
     }
     listener() {
       const logger = this.logger;
       const plugin = this.plugin;
       const options = this.options;
-      const register2 = () => this.register();
+      const register2 = () => this.userscript.registerListenersForPlugin(plugin);
       return function(event) {
         logger.debug(`handle called for '${options.name}' with delay of '${options.delay}'`);
         setTimeout(() => {
@@ -371,6 +372,7 @@
     constructor(logger) {
       this.logger = logger;
       this.context = { logger };
+      this.eventListeners = {};
     }
     registerPlugin(plugin) {
       const matches = plugin.matches || (() => true);
@@ -386,12 +388,21 @@
     }
     registerEvent(plugin, event) {
       this.logger.debug(`Registering event '${event.name}`);
-      const listener = new UserScriptEventListener(this.logger, plugin, event);
+      const listener = new UserScriptEventListener(this, plugin, event);
       listener.register();
+      const listeners = this.eventListeners[plugin.name] || [];
+      listeners.push(listener);
+      this.eventListeners[plugin.name] = listeners;
     }
     registerShortcut(shortcut) {
       this.logger.debug(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.name}'`);
       register(shortcut.key, shortcut.callback, shortcut.options);
+    }
+    registerListenersForPlugin(plugin) {
+      const listeners = this.eventListeners[plugin.name] || [];
+      for (const listener of listeners) {
+        listener.register();
+      }
     }
   };
   function userscript_default({

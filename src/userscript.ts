@@ -60,12 +60,14 @@ export type UserScriptOptions = {
 }
 
 class UserScriptEventListener {
+  userscript: UserScript;
   logger: Logger;
   plugin: UserScriptPlugin;
   options: UserScriptEventOptions;
 
-  constructor(logger: Logger, plugin: UserScriptPlugin, options: UserScriptEventOptions) {
-    this.logger = logger;
+  constructor(userscript: UserScript, plugin: UserScriptPlugin, options: UserScriptEventOptions) {
+    this.userscript = userscript;
+    this.logger = userscript.logger;
     this.plugin = plugin;
     this.options = options;
   }
@@ -80,14 +82,14 @@ class UserScriptEventListener {
       }
       count = count + elements.length;
     }
-    this.logger.debug(`Registered '${count}' event handlers for '${this.options.name}'`);
+    this.logger.debug(`Registered '${count}' event handlers for '${this.options.name}' (plugin: ${this.plugin.name})`);
   }
 
   listener() {
     const logger = this.logger;
     const plugin = this.plugin;
     const options = this.options;
-    const register = () => this.register();
+    const register = () => this.userscript.registerListenersForPlugin(plugin);
     return function(event: Event) {
       logger.debug(`handle called for '${options.name}' with delay of '${options.delay}'`);
       setTimeout(() => {
@@ -103,10 +105,12 @@ class UserScriptEventListener {
 class UserScript {
   logger: Logger;
   context: UserScriptContext;
+  eventListeners: {[pluginName: string]: UserScriptEventListener[]};
 
   constructor(logger: Logger) {
     this.logger = logger;
     this.context = { logger };
+    this.eventListeners = {};
   }
 
   registerPlugin(plugin: UserScriptPlugin) {
@@ -124,13 +128,23 @@ class UserScript {
 
   registerEvent(plugin: UserScriptPlugin, event: UserScriptEventOptions) {
     this.logger.debug(`Registering event '${event.name}`);
-    const listener = new UserScriptEventListener(this.logger, plugin, event);
+    const listener = new UserScriptEventListener(this, plugin, event);
     listener.register();
+    const listeners = this.eventListeners[plugin.name] || [];
+    listeners.push(listener);
+    this.eventListeners[plugin.name] = listeners;
   }
 
   registerShortcut(shortcut: UserScriptShortcut) {
     this.logger.debug(`Registering shortcut key '${shortcut.key}' and shortcut '${shortcut.name}'`);
     register(shortcut.key, shortcut.callback, shortcut.options);
+  }
+
+  registerListenersForPlugin(plugin: UserScriptPlugin) {
+    const listeners = this.eventListeners[plugin.name] || [];
+    for (const listener of listeners) {
+      listener.register();
+    }
   }
 }
 
