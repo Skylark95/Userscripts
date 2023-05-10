@@ -341,11 +341,16 @@
       this.options = options;
     }
     register() {
-      const elements = document.querySelectorAll(this.options.querySelector);
-      for (const el of elements) {
-        el.addEventListener(this.options.type, this.listener());
+      const querySelectors = Array.isArray(this.options.querySelector) ? this.options.querySelector : [this.options.querySelector];
+      let count = 0;
+      for (const querySelector of querySelectors) {
+        const elements = document.querySelectorAll(querySelector);
+        for (const el of elements) {
+          el.addEventListener(this.options.type, this.listener());
+        }
+        count = count + elements.length;
       }
-      this.logger.debug(`Registered '${elements.length}' event handlers for '${this.options.name}'`);
+      this.logger.debug(`Registered '${count}' event handlers for '${this.options.name}'`);
     }
     listener() {
       const logger = this.logger;
@@ -426,6 +431,7 @@
   }
   userscript_default({
     name: "gg.deals",
+    logLevel: 0 /* Debug */,
     shortcuts: [{
       name: "gg.deals search shortcut",
       key: "/",
@@ -440,10 +446,10 @@
       name: "gg.deals steam links on bundle and deal pages",
       matches: (location) => !!location.pathname.match(/\/(bundle|deal)\/.+/),
       events: [{
-        name: "gg.deals page navigation event",
+        name: "gg.deals page update event",
         type: "click",
         delay: 2e3,
-        querySelector: ".pjax-link"
+        querySelector: [".pjax-link", ".filter", ".badge-filter"]
       }],
       run: () => {
         const items = document.querySelectorAll(".game-item");

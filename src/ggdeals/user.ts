@@ -1,4 +1,4 @@
-import userscript from "../userscript";
+import userscript, { LogLevel } from "../userscript";
 
 function requestSteamLink(a: HTMLAnchorElement, title: string) {
   GM_xmlhttpRequest({
@@ -22,6 +22,7 @@ function requestSteamLink(a: HTMLAnchorElement, title: string) {
 
 userscript({
   name: 'gg.deals',
+  logLevel: LogLevel.Debug,
   shortcuts: [{
     name: 'gg.deals search shortcut',
     key: '/',
@@ -36,10 +37,10 @@ userscript({
     name: 'gg.deals steam links on bundle and deal pages',
     matches: (location: Location) => !!location.pathname.match(/\/(bundle|deal)\/.+/),
     events:[{
-      name: 'gg.deals page navigation event',
+      name: 'gg.deals page update event',
       type: 'click',
       delay: 2000,
-      querySelector: '.pjax-link'
+      querySelector: ['.pjax-link', '.filter', '.badge-filter']
     }],
     run: () => {
       const items = document.querySelectorAll('.game-item');

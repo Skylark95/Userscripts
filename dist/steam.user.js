@@ -340,11 +340,16 @@
       this.options = options;
     }
     register() {
-      const elements = document.querySelectorAll(this.options.querySelector);
-      for (const el of elements) {
-        el.addEventListener(this.options.type, this.listener());
+      const querySelectors = Array.isArray(this.options.querySelector) ? this.options.querySelector : [this.options.querySelector];
+      let count = 0;
+      for (const querySelector of querySelectors) {
+        const elements = document.querySelectorAll(querySelector);
+        for (const el of elements) {
+          el.addEventListener(this.options.type, this.listener());
+        }
+        count = count + elements.length;
       }
-      this.logger.debug(`Registered '${elements.length}' event handlers for '${this.options.name}'`);
+      this.logger.debug(`Registered '${count}' event handlers for '${this.options.name}'`);
     }
     listener() {
       const logger = this.logger;
