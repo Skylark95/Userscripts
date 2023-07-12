@@ -455,7 +455,7 @@
     }],
     plugins: [{
       name: "gg.deals steam links on bundle and deal pages",
-      matches: (location) => !!location.pathname.match(/\/(bundle|deal)\/.+/),
+      matches: (location) => !!location.pathname.match(/\/(bundle|deal|wallet-friendly)\/.+/),
       events: [{
         name: "gg.deals page navigation event",
         type: "click",
